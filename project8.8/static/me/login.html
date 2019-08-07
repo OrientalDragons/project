@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- popper.min.js 用于弹窗、提示、下拉菜单 -->
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+</head>
+
+<body background="./src/background2.png" style="height: 98vh">
+
+    <!-- <body style="height: 100vh"> -->
+
+
+
+    <div class="container mt-3 align-items-center justify-content-center h-100" id="login">
+        <div class="input-group mb-3" style="top: 50%;position: relative">
+            <input type="password" class="form-control" placeholder="login token" v-model="password">
+            <div class="input-group-append">
+                <button class="btn btn-primary" v-on:click.stop="login()">login</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <div id="login">
+        <input type="password" v-model="password">
+        <button v-on:click.stop="login()">login</button>
+    </div> -->
+    <script>
+        new Vue({
+            el: '#login',
+            data: {
+                password: ""
+            },
+            methods: {
+                login: function () {
+    
+                    this.$http.post('/?anchor=login', {
+                        "password": this.password,
+
+                    }).then(function (res) {
+                        console.log(res.body)
+                        if (res.body == "ok") {
+                            window.location.href = "/static/me/main.html"
+                        }
+                    }, function (res) {
+                        if (res.status === 404) {
+                            this.output = "The request status is 404 not found. Do you sure that you had already got the session?"
+                            console.log(this.output)
+                        }
+                    });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
