@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <style>
+        .dropbox {
+            border: .25rem dashed #007bff;
+            min-height: 5rem;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body background="/static/me/src/background.jpg">
+    <div id="app" class="m-5">
+        <div class="form-group">
+            <div class="input-group mb-3">
+                <div class="input-group-append rounded-left">
+                    <span class="input-group-text bg-primary  text-white rounded-left">route</span>
+                </div>
+                <input type="text" class="form-control" v-model="route">
+            </div>
+        </div>
+        <img id="imgx" src="" alt="xxx">
+        <a href="#" v-on:click.stop="getbyid(92)">xxx</a>
+        <div class="dropbox p-3 text-center">
+            <a class="text-center" href="/static/me/main.html">return</a>
+        </div>
+    </div>
+    <script>
+        function arrayBufferToBase64(buffer) {
+            var binary = '';
+            var bytes = new Uint8Array(buffer);
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+        function stringToByte(str) {
+            var bytes = new Array();
+            var len, c;
+            len = str.length;
+            for (var i = 0; i < len; i++) {
+                c = str.charCodeAt(i);
+                if (c >= 0x010000 && c <= 0x10FFFF) {
+                    bytes.push(((c >> 18) & 0x07) | 0xF0);
+                    bytes.push(((c >> 12) & 0x3F) | 0x80);
+                    bytes.push(((c >> 6) & 0x3F) | 0x80);
+                    bytes.push((c & 0x3F) | 0x80);
+                } else if (c >= 0x000800 && c <= 0x00FFFF) {
+                    bytes.push(((c >> 12) & 0x0F) | 0xE0);
+                    bytes.push(((c >> 6) & 0x3F) | 0x80);
+                    bytes.push((c & 0x3F) | 0x80);
+                } else if (c >= 0x000080 && c <= 0x0007FF) {
+                    bytes.push(((c >> 6) & 0x1F) | 0xC0);
+                    bytes.push((c & 0x3F) | 0x80);
+                } else {
+                    bytes.push(c & 0xFF);
+                }
+            }
+            return bytes;
+
+
+        }
+
+        new Vue({
+            el: '#app',
+            data: {
+                item: [],
+                route: "/",
+                imgsr: ''
+            },
+            methods: {
+                /*getbyid: function (id) {
+                    this.$http.post('/filebook/', {
+                        "anchor": "getbyid",
+                        "id": "98",
+                    }).then(function (res) {
+                        this.output = res.body
+                        // data = stringToByte(res.body)
+                        // console.log(arrayBufferToBase64(data))
+                        // $("#img").attr("src","data:image/jpg;base64,"+res.body)
+                        // var outputImg = document.createElement('img');
+                        // outputImg.src = 'data:image/jpeg;base64,' + res.body;
+                        // document.body.appendChild(outputImg);
+                        $("#imgx").attr("src", 'data:image/png;base64,' + res.body)
+                        // // append it to your page
+
+                        blob = new Blob([res.body])
+                        // var reader = new FileReader();
+                        // reader.readAsDataURL(blob);
+                        // reader.onload = function (e) {
+                        //     var a = document.createElement('a');
+                        //     a.download = 'data.jpeg';
+                        //     a.href = e.target.result;
+                        //     $("body").append(a);  // 修复firefox中无法触发click
+                        //     a.click();
+                        // }
+
+                        var a = document.createElement("a");
+                        a.download = "fileName.mp4";
+                        a.href = 'data:;base64,' + res.body
+                        // console.log(res.body)
+                        // a.href = res.body;
+                        a.click();
+
+
+                    }, function (res) {
+                        if (res.status === 404) {
+                            console.log(this.output)
+                        }
+                    });
+                }
+                */
+            },
+            mounted: function () {
+                var dropbox = document.querySelector('.dropbox');
+            }
+        });
+    </script>
+</body>
+
+</html>

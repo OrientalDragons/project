@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.staticfile.org/vue/2.4.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+</head>
+<style>
+    #xx {
+        padding: 0%;
+        margin: 0%
+    }
+</style>
+
+<body class="bg-secondary text-white">
+    <div id="page">
+        <!-- 导航 -->
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark" style="width: 100%;">
+            <a class="navbar-brand" href="/upload1Tdhblw/">up</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+                <div class="row mx-auto" ref="search">
+
+
+                    <div class="input-group mt-3 mb-3">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" v-on:click.stop="newContent()"
+                                type="submit">new</button>
+                        </div>
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-outline-secondary dropdown-toggle "
+                                data-toggle="dropdown">
+                                {{search.searchAnchor}}
+                            </button>
+
+
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" v-on:click="SearchAnchor('主题')" href="#">主题</a>
+                                <a class="dropdown-item" v-on:click="SearchAnchor('描述')" href="#">描述</a>
+                                <a class="dropdown-item" v-on:click="SearchAnchor('标签')" href="#">标签</a>
+                                <a class="dropdown-item" v-on:click="SearchAnchor('内容')" href="#">内容</a>
+                                <a class="dropdown-item" v-on:click="SearchAnchor('全部')" href="#">全部</a>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search" v-model="search.searchStr">
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="submit">Go</button>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+            </div>
+
+
+        </nav>
+        <!-- 简略内容 -->
+        <div class="container" v-if="display.openContent==false&&display.optionHander==false">
+            <!-- 主体 -->
+            <!-- <div v-for="item in dataFilter()">
+                {{item}}
+            </div> -->
+
+            <div v-for="item in dataFilter()">
+                <div class="card bg-dark" v-on:click.stop="showContent(item.ID)">
+                    <div class="card-body" style="border-block-color: white">
+                        <h4 class="card-title">{{item.theme}}</h4>
+                        <p class="card-text" style=" width: 100%;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow:hidden;">{{item.describe}}</p>
+                        <a href="#" class="card-link">{{item.label}}</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 详细内容 -->
+        <div v-if="display.openContent==true">
+            <!-- 标题 -->
+            <div class="container">
+                <div class="card bg-dark border-info">
+                    <div class="card-body text-center">{{currentData.theme}}</div>
+                    <div class="card-footer">
+                        <p>{{currentData.describe}}</p>
+                        <p>{{currentData.label}}</p>
+                    </div>
+                </div>
+            </div>
+            <p> </p>
+
+            <div class="container">
+
+                <div class="card bg-dark">
+
+                    <div class="card-body">
+                        <pre class="text-white">{{currentData.content}}</pre>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" class="card-link" v-on:click.stop="showContent()">返回</a>
+                        <a href="#" class="card-link" v-on:click.stop="updateContent()">修改</a>
+                        <a href="#" class="card-link" v-on:click.stop="submitRequest('delete')">删除</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- 修改、增加 -->
+        <div class="container" v-if="display.optionHander&&display.openContent==false">
+            <div class="card  bg-secondary">
+
+                <div class="card-body bg-dark">
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-append rounded-left">
+                                <span class="input-group-text bg-secondary text-white rounded-left">主题</span>
+                            </div>
+                            <input type="text" class="form-control" v-model="newOrUpdateData.theme">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-append rounded-left">
+                                <span class="input-group-text bg-secondary text-white rounded-left">label</span>
+                            </div>
+                            <input type="text" class="form-control" v-model="newOrUpdateData.label">
+                        </div>
+                    </div>
+                </div>
+                <p> </p>
+                <div class="card-body bg-dark">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-sm btn-block border"
+                            v-on:click.stop="ipDescribe()">描述</button>
+                        <textarea class="form-control" rows="3" id="comment" v-if="display.inputDescribe==true"
+                            v-model="newOrUpdateData.describe"></textarea>
+                    </div>
+                </div>
+                <p> </p>
+                <div class="card-body bg-dark">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-sm btn-block border"
+                            v-on:click.stop="ipContent()">内容</button>
+                        <textarea class="form-control" rows="6" id="comment" v-if="display.inputContent==true"
+                            v-model="newOrUpdateData.content"></textarea>
+                    </div>
+                </div>
+                <form>
+                    <div class="radio">
+                        <input type="radio" name="optradio" value="false"
+                            v-model="newOrUpdateData.aut"><label>仅自己可看</label>
+                        <input type="radio" name="optradio" value="true"
+                            v-model="newOrUpdateData.aut"><label>公开显示</label>
+                        {{newOrUpdateData.aut}}
+                    </div>
+                </form>
+                <div class="card-body bg-dark">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary btn-sm btn-block border"
+                            v-on:click.stop="submitRequest()">submit</button>
+                        <button type="button" class="btn btn-secondary btn-sm btn-block border"
+                            v-on:click.stop="cancel()">cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: "#page",
+        data: {
+            msg: "",
+            clientWidth: "",//根据页面变动，设置搜索框的变动
+            search: {
+                searchAnchor: "主题",
+                searchStr: "",
+                before:""
+            },
+            display: {
+                changescreen: false,
+                new_update: false,//new=>false update=>true
+                openContent: false,
+                optionHander: false,
+                inputContent: false,
+                inputDescribe: false,
+            },
+            dataArrAll: [],
+            dataArr: [
+                // {
+                //     describe: "asdasd",
+                //     id: "5",
+                //     label: "",
+                //     theme: "嘻嘻嘻",
+                // },
+                // {
+                //     describe: "asdasd",
+                //     id: "5",
+                //     label: "",
+                //     theme: "嘻嘻嘻",
+                // },
+                // {
+                //     describe: "asdasd",
+                //     id: "5",
+                //     label: "",
+                //     theme: "嘻嘻嘻",
+                // }
+            ],
+            currentData: {
+                describe: "",
+                id: "",
+                label: "",
+                theme: "",
+                content: "",
+                aut: "false",
+            },
+            newOrUpdateData: {
+                describe: "",
+                id: "",
+                label: "",
+                theme: "",
+                content: "",
+                aut: "false",
+            },
+            label: []
+        },
+        mounted() {
+            //初始化
+
+            /* 
+            获取浏览器宽度
+            this.clientWidth = `${document.documentElement.clientWidth}`          //document.body.clientWidth;
+            window.onresize = function temp() {
+                if (changescreen == false) {
+                    this.clientWidth = `${document.documentElement.clientWidth}`;
+                }
+                // if (a*b<100){
+                location.reload(location.href)
+                // }
+            };
+            */
+            //加载
+            this.Load()
+        },
+
+        methods: {
+            dataFilter: function () {
+                var returnData = []
+
+                if (this.search.searchAnchor == "主题" && this.search.searchStr != "") {
+                    for (i in this.dataArr) {
+
+                        if (this.dataArr[i].theme.search(this.search.searchStr) >= 0) {
+                            returnData.push(this.dataArr[i])
+                        }
+                    }
+                    return returnData
+                }
+                if (this.search.searchAnchor == "描述" && this.search.searchStr != "") {
+                    for (i in this.dataArr) {
+
+                        if (this.dataArr[i].describe.search(this.search.searchStr) >= 0) {
+                            returnData.push(this.dataArr[i])
+                        }
+                    }
+                    return returnData
+                }
+                if (this.search.searchAnchor == "标签" && this.search.searchStr != "") {
+                    for (i in this.dataArr) {
+
+                        if (this.dataArr[i].label.search(this.search.searchStr) >= 0) {
+                            returnData.push(this.dataArr[i])
+                        }
+                    }
+                    return returnData
+                }
+
+
+                if (this.search.searchAnchor == "内容" && this.search.searchStr != "") {
+                    if(this.search.before!=this.search.searchStr){
+                        console.log("change")
+                        this.LoadAll()
+                        Vue.set(this.search, "before", this.search.searchStr)
+                    }
+  
+                    for (i in this.dataArrAll) {
+                        if (this.dataArrAll[i].content.search(this.search.searchStr) >= 0) {
+                            returnData.push(this.dataArrAll[i])
+                        }
+                    }
+                    return returnData
+                }
+
+
+                if (this.search.searchAnchor == "全部" && this.search.searchStr != "") {
+                    for (i in this.dataArr) {
+
+                        if (this.dataArr[i].theme.search(this.search.searchStr) >= 0 ||
+                            this.dataArr[i].label.search(this.search.searchStr) >= 0 ||
+                            this.dataArr[i].describe.search(this.search.searchStr) >= 0) {
+                            returnData.push(this.dataArr[i])
+                        }
+                    }
+                    return returnData
+                }
+                if (this.search.searchStr == "") {
+                    return this.dataArr
+                }
+            },
+            LoadAll: function () {
+                this.$http.get('/?anchor=all').then(function (res) {
+                    //返回
+                    // for (i in res.body) {
+                    //     if (res.body[i].content.search(this.search.searchStr) >= 0) {
+                    //         this.dataArrAll.push(res.body[i])
+                    //     }
+                    // }
+                    // console.log(returnData)
+                    Vue.set(this.$data, "dataArrAll", res.body)
+                }, function (res) {
+                    console.log("err:", res)
+                })
+            },
+            Load: function () {
+                this.$http.get('/notebook/?anchor=note').then(function (res) {
+                    Vue.set(this.$data, "dataArr", res.body)
+                }, function (res) {
+                    console.log("err:", res)
+                })
+            },
+            SearchAnchor: function (str) {
+                Vue.set(this.search, 'searchAnchor', str)
+                return
+            },
+            submitRequest: function (methor = "") {
+                if (methor == "") {
+                    if (this.display.new_update == false) {
+                        methor = "new"
+                    }
+                    if (this.display.new_update == true) {
+                        methor = "update"
+                    }
+                }
+
+                if (methor == "new") {
+                    console.log(this.newOrUpdateData)
+                    this.$http.post('/notebook/', {
+                        "methor": "new",
+                        "theme": this.newOrUpdateData.theme,
+                        "content": this.newOrUpdateData.content,
+                        "describe": this.newOrUpdateData.describe,
+                        "label": this.newOrUpdateData.label,
+                        "aut": this.newOrUpdateData.aut
+                    }).then(function (res) {
+                        this.output = res.body
+                        if (res.body == "ok") {
+                            this.Load()
+                            this.cancel()
+                        }
+                    }, function (res) {
+                        if (res.status === 404) {
+                            console.log(this.output)
+                        }
+                    });
+                }
+                if (methor == "delete") {
+
+                    var r = confirm("yes?")
+                    if (r == true && this.newOrUpdateData.id != null) {
+                        console.log(this.currentData.id)
+                        this.$http.post('/notebook/', {
+                            "methor": "delete",
+                            "id": this.currentData.id,
+                        }).then(function (res) {
+                            if (res.body != "ok") {
+                                console.log(res.body)
+                            }
+                            this.Load(this)
+                            this.cancel()
+                        }, function (res) {
+                            if (res.status === 404) {
+                                console.log(res)
+                            }
+                        });
+                    }
+                }
+                if (methor == "update") {
+                    var r = confirm("yes?")
+                    if (r == true) {
+                        this.$http.post('/notebook/', {
+                            "methor": "update",
+                            "id": this.newOrUpdateData.id,
+                            "theme": this.newOrUpdateData.theme,
+                            "content": this.newOrUpdateData.content,
+                            "label": this.newOrUpdateData.label,
+                            "describe": this.newOrUpdateData.describe,
+                            "aut": this.newOrUpdateData.aut,
+                        }).then(function (res) {
+                            if (res.body != "ok") {
+                                console.log(res.body)
+                            }
+                            this.Load()
+                            this.showContent(this.newOrUpdateData.id)
+                            this.cancel()
+                        }, function (res) {
+                            if (res.status === 404) {
+                                console.log(res)
+                            }
+                        });
+                    }
+                }
+            },
+            //display control
+            showContent: function (id = null) {
+                if (this.display.openContent) {
+                    Vue.set(this.currentData, 'describe', '')
+                    Vue.set(this.currentData, 'id', 0)
+                    Vue.set(this.currentData, 'label', '')
+                    Vue.set(this.currentData, 'theme', '')
+                    Vue.set(this.currentData, 'content', '')
+                    Vue.set(this.currentData, 'aut', "false")
+                    this.display.openContent = false
+                } else {
+                    console.log("num:" + id)
+                    this.$http.post('/notebook/', {
+                        "methor": "open",
+                        "id": id,
+                    }).then(function (res) {
+                        console.log(res.body)
+                        this.opendata = res.body
+                        aut = "false"
+                        if (res.body[0].aut[0] == 1) {
+                            aut = "true"
+                        }
+                        Vue.set(this.currentData, 'describe', res.body[0].describe)
+                        Vue.set(this.currentData, 'id', res.body[0].ID)
+                        Vue.set(this.currentData, 'label', res.body[0].label)
+                        Vue.set(this.currentData, 'theme', res.body[0].theme)
+                        Vue.set(this.currentData, 'content', res.body[0].content)
+                        Vue.set(this.currentData, 'aut', aut)
+                        this.display.openContent = true
+                    }, function (res) {
+                        if (res.status === 404) {
+                            console.log("error")
+                        }
+                    });
+
+                }
+
+            },
+            newContent: function () {
+                Vue.set(this.newOrUpdateData, 'describe', '')
+                Vue.set(this.newOrUpdateData, 'id', 0)
+                Vue.set(this.newOrUpdateData, 'label', '')
+                Vue.set(this.newOrUpdateData, 'theme', '')
+                Vue.set(this.newOrUpdateData, 'content', '')
+                Vue.set(this.newOrUpdateData, 'aut', "false")
+                this.display.new_update = false
+                this.display.openContent = false
+                this.display.optionHander = true
+            },
+            updateContent: function () {
+                Vue.set(this.newOrUpdateData, 'describe', this.currentData.describe)
+                Vue.set(this.newOrUpdateData, 'id', this.currentData.id)
+                Vue.set(this.newOrUpdateData, 'label', this.currentData.label)
+                Vue.set(this.newOrUpdateData, 'theme', this.currentData.theme)
+                Vue.set(this.newOrUpdateData, 'content', this.currentData.content)
+                Vue.set(this.newOrUpdateData, 'aut', this.currentData.aut)
+                console.log(this.newOrUpdateData.aut, this.currentData.aut)
+                this.display.new_update = true
+                this.display.openContent = false
+                this.display.optionHander = true
+            },
+            deleteContent: function () {
+                this.display.openContent = false
+            },
+            ipContent: function () {
+                if (this.display.inputContent == false) {
+                    this.display.inputContent = true
+                } else {
+                    this.display.inputContent = false
+                }
+            },
+            ipDescribe: function () {
+                if (this.display.inputDescribe == false) {
+                    this.display.inputDescribe = true
+                } else {
+                    this.display.inputDescribe = false
+                }
+            },
+            cancel: function () {
+
+                if (this.display.new_update == true) {
+                    this.display.new_update = false
+                    this.display.openContent = true
+                    this.display.optionHander = false
+                } else {
+                    this.display.openContent = false
+                    this.display.optionHander = false
+                }
+
+            }
+
+        },
+        filters: {
+            capitalize: function (value) {
+                if (!value) return '';
+                value = value.toString();
+                return value.toUpperCase();
+            },
+
+        },
+        // computed: {
+        //     test: function () {
+        //         console.log(this)
+        //         return this.dataArr
+        //     }
+        // }
+
+    })
+
+
+</script>
+
+
+</html>
